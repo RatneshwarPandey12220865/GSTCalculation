@@ -1,0 +1,11 @@
+streamlit
+playwright
+playwright-stealth
+ddddocr
+openpyxl
+transformers
+torch
+soundfile
+Pillow
+numpy
+pandas

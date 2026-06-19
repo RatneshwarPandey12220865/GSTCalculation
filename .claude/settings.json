@@ -1,0 +1,23 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(./.venv/Scripts/python.exe -c \"import ast; ast.parse\\(open\\('main.py'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(./.venv/Scripts/python.exe -c \"import ast; ast.parse\\(open\\('main.py', encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(./.venv/Scripts/python.exe -c \"import sys; print\\(sys.version\\)\")",
+      "Bash(./.venv/Scripts/pip.exe list *)",
+      "Bash(./.venv/Scripts/pip.exe install *)",
+      "Bash(./.venv/Scripts/pip install *)",
+      "Bash(./.venv/Scripts/python.exe -c \"import streamlit, pandas; print\\('streamlit', streamlit.__version__, '| pandas', pandas.__version__\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -c \"import ast; ast.parse\\(open\\('main.py',encoding='utf-8'\\).read\\(\\)\\); print\\('syntax OK'\\)\")",
+      "Bash(./.venv/Scripts/python.exe -c \"import transformers, torch; print\\('transformers', transformers.__version__\\); print\\('torch', torch.__version__\\)\")",
+      "Bash(PYTHONIOENCODING=utf-8 ./.venv/Scripts/python.exe -c \"import transformers, torch; print\\('transformers', transformers.__version__\\); print\\('torch', torch.__version__\\)\")",
+      "Bash(.venv/Scripts/pip install *)",
+      "Bash(.venv/Scripts/python -c \"import ddddocr; help\\(ddddocr.DdddOcr.__init__\\)\")",
+      "Bash(.venv/Scripts/python -c ' *)",
+      "Bash(timeout 90 c:/Users/pande/Desktop/a/KPMG/GoodsAndService/.venv/Scripts/python.exe -W ignore -c ' *)",
+      "Bash(Get-Content \"C:\\\\Users\\\\pande\\\\AppData\\\\Local\\\\Temp\\\\claude\\\\c--Users-pande-Desktop-a-KPMG-GoodsAndService\\\\ad71d491-4b61-4272-85e6-514c050735c9\\\\tasks\\\\blk8jfz82.output\" -Tail 10)",
+      "Bash(gh auth *)",
+      "PowerShell(gh auth status 2>&1)"
+    ]
+  }
+}
