@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+.env
+*.xlsx
+*.xls
+captcha_*.png
+audio_*.wav
+audio_*.ogg
+.claude/

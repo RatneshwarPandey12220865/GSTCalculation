@@ -94,6 +94,42 @@ def _ocr_classify(ocr_instance, img_bytes: bytes) -> str:
         return ""
 
 
+# ── TrOCR (HuggingFace printed-text OCR) ─────────────────────────────────────
+
+_TROCR_PROCESSOR = None
+_TROCR_MODEL = None
+
+
+def _get_trocr():
+    """
+    Lazy-load microsoft/trocr-small-printed (~346 MB, downloaded once).
+    Better than ddddocr on noisy/distorted printed digits.
+    """
+    global _TROCR_PROCESSOR, _TROCR_MODEL
+    if _TROCR_PROCESSOR is None:
+        from transformers import TrOCRProcessor, VisionEncoderDecoderModel
+        _TROCR_PROCESSOR = TrOCRProcessor.from_pretrained("microsoft/trocr-small-printed")
+        _TROCR_MODEL     = VisionEncoderDecoderModel.from_pretrained("microsoft/trocr-small-printed")
+        _TROCR_MODEL.eval()
+        print("[trocr] Model loaded OK")
+    return _TROCR_PROCESSOR, _TROCR_MODEL
+
+
+def _trocr_classify(img_bytes: bytes) -> str:
+    try:
+        import torch
+        processor, model = _get_trocr()
+        img = Image.open(io.BytesIO(img_bytes)).convert("RGB")
+        pixel_values = processor(images=img, return_tensors="pt").pixel_values
+        with torch.no_grad():
+            generated_ids = model.generate(pixel_values, max_new_tokens=20)
+        text = processor.batch_decode(generated_ids, skip_special_tokens=True)[0].strip()
+        return text
+    except Exception as e:
+        print(f"[trocr] classify failed: {e}")
+        return ""
+
+
 def solve_captcha_image(img_bytes: bytes) -> str | None:
     ocr     = _get_ocr()
     ocr_old = _get_ocr_old()
@@ -105,7 +141,8 @@ def solve_captcha_image(img_bytes: bytes) -> str | None:
         variants = []
 
     candidates: list[str] = []
-    # Run both models on every variant + raw image
+
+    # ddddocr (new + old) on every variant + raw image
     for img in variants + [img_bytes]:
         for model_label, model in [("new", ocr), ("old", ocr_old)]:
             raw = _ocr_classify(model, img)
@@ -116,6 +153,17 @@ def solve_captcha_image(img_bytes: bytes) -> str | None:
             print(f"[ocr/{model_label}] raw='{safe_raw}' -> digits='{digits}'")
             if len(digits) == 6:
                 candidates.append(digits)
+
+    # TrOCR on raw image + first 3 variants (skip rest to stay fast)
+    for img in ([img_bytes] + variants[:3]):
+        raw = _trocr_classify(img)
+        if not raw:
+            continue
+        digits = re.sub(r"[^0-9]", "", raw)
+        safe_raw = raw.encode("ascii", errors="replace").decode()
+        print(f"[ocr/trocr] raw='{safe_raw}' -> digits='{digits}'")
+        if len(digits) == 6:
+            candidates.append(digits)
 
     if not candidates:
         print("[ocr] No variant produced 6 digits -- will fall back to audio.")

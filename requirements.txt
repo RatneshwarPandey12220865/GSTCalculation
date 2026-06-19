@@ -5,6 +5,7 @@ ddddocr
 openpyxl
 transformers
 torch
+torchvision
 soundfile
 Pillow
 numpy
